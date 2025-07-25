@@ -1,0 +1,19 @@
+/*~~*/ /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/*~~*/ /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+<Router AppAssembly="/*~~~~~~~~~~~~~~~~~~~~*/">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="/*~~~~~~*/" DefaultLayout="/*~~~~~~~~~~~~~~~*/">
+                    <NotAuthorized>
+                        ~~ /*~~~~*/ ~~ /**/ /*~*/ /*~~~*/ ~~
+                        <RedirectToLogin />
+                    </NotAuthorized>
+                    <Authorizing>
+                        <p>Authorizing...</p>
+                    </Authorizing>
+        </AuthorizeRouteView>
+        <!-- <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" /> -->
+        <!-- <FocusOnNavigate RouteData="routeData" Selector="h1" /> -->
+    </Found>
+</Router>
+

@@ -2,6 +2,10 @@ using MudBlazor.Services;
 using Kairos.BlazorApp.Components;
 using Serilog;
 using Serilog.Events;
+using Microsoft.EntityFrameworkCore;
+using Kairos.BlazorApp;
+using Microsoft.AspNetCore.Identity;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +22,27 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
+
+builder.Services.AddDbContext<KairosDbContext>(options => options.UseSqlite("Data Source=kairos.db"));
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+})
+.AddDefaultUI()
+.AddEntityFrameworkStores<KairosDbContext>();
+
+// TODO: Create AuthHelper interface
+builder.Services.AddScoped<AuthHelper>();
+
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<KairosDbContext>();
+    db.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -28,13 +52,17 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 
+app.UseHttpsRedirection();
 
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+app.MapRazorPages();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 Log.Logger.Information("Starting host");
+
 app.Run();
