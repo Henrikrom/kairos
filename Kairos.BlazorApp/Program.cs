@@ -22,6 +22,10 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
+builder.Host.ConfigureHostOptions(option =>
+{
+    option.ShutdownTimeout = TimeSpan.FromSeconds(1);
+});
 
 builder.Services.AddDbContext<KairosDbContext>(options => options.UseSqlite("Data Source=kairos.db"));
 
@@ -32,8 +36,8 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 .AddDefaultUI()
 .AddEntityFrameworkStores<KairosDbContext>();
 
-// TODO: Create AuthHelper interface
-builder.Services.AddScoped<AuthHelper>();
+builder.Services.AddScoped<IAuthHelper, AuthHelper>();
+builder.Services.AddScoped<IReminderRepository, ReminderRepositoryMock>();
 
 var app = builder.Build();
 

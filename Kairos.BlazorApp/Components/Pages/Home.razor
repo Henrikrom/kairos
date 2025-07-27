@@ -2,17 +2,54 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
-@inject AuthHelper AuthHelper
+@inject IAuthHelper AuthHelper
 @inject ILogger<Home> Logger
+@inject IReminderRepository ReminderRepository
 @attribute [Authorize]
 
-<h3> Reminders </h3>
+<MudText Typo="Typo.h4" Class="my-4"> Reminders </MudText>
+    
+<MudButton Class="mb-3" Variant=Variant.Filled Color=Color.Primary OnClick="() => _openReminderDrawer = !_openReminderDrawer">Add Reminder</MudButton>
+
+<MudStack> 
+    @foreach (var reminder in _reminders) {
+        <MudCard>
+            <MudCardContent>
+                <MudStack Row="true" Justify=Justify.SpaceAround>
+                    <MudText> @reminder.Text  </MudText>
+                    <MudButton>Middle</MudButton>
+                    <MudButton>Finished</MudButton>
+                </MudStack>
+            </MudCardContent>
+        </MudCard>
+    }
+</MudStack> 
+
+ 
+<MudDrawer Width="40%" @bind-Open="@_openReminderDrawer" Anchor=Anchor.End Elevation="1" Variant="@DrawerVariant.Temporary" OverlayAutoClose=true>
+    <MudDrawerHeader>
+        <MudText Typo="Typo.h6" Class="my-4">Create Reminder</MudText>
+    </MudDrawerHeader>
+    <MudCardContent>
+        <MudDatePicker Label="Reminder Date" @bind-Date="@_reminderDate"/>
+        <MudTimePicker Label="24 hours (editable)" Editable="true" @bind-Time="@_reminderTime" />
+    </MudCardContent>
+</MudDrawer>
+
 
 @code {
     private string? _userId;
+    private List<Reminder> _reminders = new();
+    private bool _openReminderDrawer = false;
+
+    private DateTime? _reminderDate;
+    private TimeSpan? _reminderTime;
+
+    private Reminder _newReminder = new();
 
     protected override async Task OnInitializedAsync()
     {
         _userId = await AuthHelper.GetUserId();
+        _reminders = await ReminderRepository.Get(_userId);
     }
 }

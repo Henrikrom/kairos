@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Kairos.BlazorApp;
 
-public class AuthHelper(AuthenticationStateProvider AuthProvider)
+public class AuthHelper(AuthenticationStateProvider AuthProvider) : IAuthHelper
 {
     public async Task<string> GetUserId() {
         var authState = await AuthProvider.GetAuthenticationStateAsync();
